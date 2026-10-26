@@ -9,7 +9,7 @@
 #define DIAG_RESPONSE_ID 0x3Du
 #define DIAG_FRAME_LENGTH 8u
 
-#define DIAG_NAD 0x42u
+#define DIAG_NAD 0x2Au
 #define DIAG_SUPPLIER_ID 0x5454u
 #define DIAG_FUNCTION_ID 0x0042u
 #define DIAG_VARIANT 0x01u

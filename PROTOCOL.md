@@ -161,7 +161,7 @@ hold, like a 1 → 0 change of the module power bit.
 
 | Property    | Value                         |
 |-------------|-------------------------------|
-| NAD         | 0x42                          |
+| NAD         | 0x2A                          |
 | Supplier ID | 0x5454 (Toptron GmbH)         |
 | Function ID | 0x0042                        |
 | Variant     | 0x01                          |
@@ -170,16 +170,16 @@ Only *Read by Identifier* (SID 0xB2) is supported.
 
 | Request (0x3C)                             | Response (0x3D)            |
 |--------------------------------------------|----------------------------|
-| `42 06 B2 00 54 54 42 00`                  | `42 06 F2 54 54 42 00 01`  |
-| `7F 06 B2 00 54 54 42 00`                  | `42 06 F2 54 54 42 00 01`  |
-| `7F 06 B2 00 FF 7F FF FF` (wildcards)      | `42 06 F2 54 54 42 00 01`  |
-| `42 06 B2 05 54 54 42 00` (identifier ≠ 0) | `42 03 7F B2 12 FF FF FF`  |
+| `2A 06 B2 00 54 54 42 00`                  | `2A 06 F2 54 54 42 00 01`  |
+| `7F 06 B2 00 54 54 42 00`                  | `2A 06 F2 54 54 42 00 01`  |
+| `7F 06 B2 00 FF 7F FF FF` (wildcards)      | `2A 06 F2 54 54 42 00 01`  |
+| `2A 06 B2 05 54 54 42 00` (identifier ≠ 0) | `2A 03 7F B2 12 FF FF FF`  |
 
-- The request is accepted with NAD 0x42 or the broadcast NAD 0x7F. Supplier ID 0x7FFF and
+- The request is accepted with NAD 0x2A or the broadcast NAD 0x7F. Supplier ID 0x7FFF and
   function ID 0xFFFF are wildcards.
-- The response always carries the dimmer's own NAD 0x42.
+- The response always carries the dimmer's own NAD 0x2A.
 - An unsupported identifier gets the negative response (error 0x12) only when the request
-  addressed NAD 0x42 directly; a broadcast request for it gets no response.
+  addressed NAD 0x2A directly; a broadcast request for it gets no response.
 - A request with a supplier or function ID that does not match, another NAD, another
   service or a PCI other than 0x06 gets no response.
 - A response is sent on the next 0x3D header only; that header discards it in any case,
