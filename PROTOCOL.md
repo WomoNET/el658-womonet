@@ -43,9 +43,10 @@ A PWM channel has 256 levels: 0 is off, 1-255 are evenly spaced in perceived bri
   least 0x1 while the channel is on.
 - Channel 4 "on" in 0x03 sets level 255.
 
-Module power is a separate switched output. As on the stock firmware it latches: it switches on when the master sets the module power bit or when any
-channel is switched on (bus or button), and stays on, also after the last channel is
-switched off, until an all-off. After power-up it is off.
+Module power is a separate switched output. As on the stock firmware it latches: it
+switches on when the master sets the module power bit or when any channel is switched on
+(bus or button), and stays on, also after the last channel is switched off, until an
+all-off. After power-up it is off.
 
 ## Control Frame 0x03
 
