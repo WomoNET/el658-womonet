@@ -124,7 +124,7 @@ static void power_bit_rising_holds_module_power(void)
     fixture_t f;
     setup(&f);
     control(&f, 0x00, 0x00, 0x00, 0x10);
-    CHECK(f.dimmer.power_hold);
+    CHECK(f.dimmer.power_latched);
     CHECK(dimmer_module_power(&f.dimmer));
 }
 
@@ -138,7 +138,7 @@ static void power_bit_falling_switches_everything_off(void)
     CHECK_EQ(level(&f, 1), LEVEL_OFF);
     CHECK_EQ(level(&f, CH4), LEVEL_OFF);
     CHECK_EQ(level(&f, CH7), LEVEL_OFF);
-    CHECK(!f.dimmer.power_hold);
+    CHECK(!f.dimmer.power_latched);
 }
 
 static void power_bit_clear_after_start_changes_nothing(void)
@@ -159,7 +159,7 @@ static void hires_frame_sets_exact_levels(void)
         CHECK_EQ(level(&f, ch), levels[ch]);
     }
     CHECK_EQ(level(&f, CH7), LEVEL_FULL);
-    CHECK(f.dimmer.power_hold);
+    CHECK(f.dimmer.power_latched);
 }
 
 static void frame_ids_keep_separate_memories(void)

@@ -58,43 +58,69 @@ static void channel_7_switches_without_fade(void)
     CHECK_EQ(dimmer_level(&dimmer, CH7), LEVEL_OFF);
 }
 
-static void all_off_switches_every_channel_and_the_hold_off(void)
+static void all_off_switches_every_channel_and_module_power_off(void)
 {
     dimmer_t dimmer;
     dimmer_init(&dimmer);
     for (uint8_t ch = 0; ch < CHANNEL_COUNT; ch++) {
         dimmer_set_level(&dimmer, ch, 90);
     }
-    dimmer_set_power_hold(&dimmer, true);
+    dimmer_latch_power(&dimmer);
     dimmer_all_off(&dimmer);
     for (uint8_t ch = 0; ch < CHANNEL_COUNT; ch++) {
         CHECK_EQ(dimmer_level(&dimmer, ch), LEVEL_OFF);
     }
-    CHECK(!dimmer.power_hold);
+    CHECK(!dimmer.power_latched);
 }
 
-static void module_power_follows_hold_and_channels(void)
+static void module_power_is_off_after_start(void)
 {
     dimmer_t dimmer;
     dimmer_init(&dimmer);
-    CHECK(!dimmer_module_power(&dimmer));
-    dimmer_set_power_hold(&dimmer, true);
-    CHECK(dimmer_module_power(&dimmer));
-    dimmer_set_power_hold(&dimmer, false);
-    dimmer_set_level(&dimmer, CH7, LEVEL_FULL);
-    CHECK(dimmer_module_power(&dimmer));
-    dimmer_set_level(&dimmer, CH7, LEVEL_OFF);
+    run(&dimmer, 10);
     CHECK(!dimmer_module_power(&dimmer));
 }
 
-static void module_power_stays_on_until_the_fade_out_ends(void)
+static void switching_a_channel_on_switches_module_power_on(void)
+{
+    dimmer_t dimmer;
+    dimmer_init(&dimmer);
+    dimmer_set_level(&dimmer, CH7, LEVEL_FULL);
+    CHECK(dimmer_module_power(&dimmer));
+}
+
+static void module_power_stays_on_after_the_last_channel_is_off(void)
 {
     dimmer_t dimmer;
     dimmer_init(&dimmer);
     dimmer_set_level(&dimmer, 0, 50);
-    CHECK(dimmer_module_power(&dimmer));
+    dimmer_set_level(&dimmer, CH7, LEVEL_FULL);
     run(&dimmer, FADE_MS + 1);
     dimmer_set_level(&dimmer, 0, LEVEL_OFF);
+    dimmer_set_level(&dimmer, CH7, LEVEL_OFF);
+    run(&dimmer, 2 * FADE_MS);
+    CHECK(dimmer_module_power(&dimmer));
+}
+
+static void button_ramp_from_off_switches_module_power_on(void)
+{
+    dimmer_t dimmer;
+    dimmer_init(&dimmer);
+    dimmer_ramp(&dimmer, 2, true);
+    run(&dimmer, 100);
+    dimmer_ramp_stop(&dimmer, 2);
+    dimmer_set_level(&dimmer, 2, LEVEL_OFF);
+    run(&dimmer, 2 * FADE_MS);
+    CHECK(dimmer_module_power(&dimmer));
+}
+
+static void all_off_switches_module_power_off_after_the_fade_out(void)
+{
+    dimmer_t dimmer;
+    dimmer_init(&dimmer);
+    dimmer_set_level(&dimmer, 0, 50);
+    run(&dimmer, FADE_MS + 1);
+    dimmer_all_off(&dimmer);
     run(&dimmer, FADE_MS / 2);
     CHECK(dimmer_module_power(&dimmer));
     run(&dimmer, FADE_MS);
@@ -173,9 +199,12 @@ void test_dimmer_suite(void)
     RUN(toggle_switches_on_at_full_by_default);
     RUN(toggle_on_restores_the_level_from_before_off);
     RUN(channel_7_switches_without_fade);
-    RUN(all_off_switches_every_channel_and_the_hold_off);
-    RUN(module_power_follows_hold_and_channels);
-    RUN(module_power_stays_on_until_the_fade_out_ends);
+    RUN(all_off_switches_every_channel_and_module_power_off);
+    RUN(module_power_is_off_after_start);
+    RUN(switching_a_channel_on_switches_module_power_on);
+    RUN(module_power_stays_on_after_the_last_channel_is_off);
+    RUN(button_ramp_from_off_switches_module_power_on);
+    RUN(all_off_switches_module_power_off_after_the_fade_out);
     RUN(ramp_reports_its_current_level);
     RUN(ramp_crosses_the_range_in_the_ramp_time);
     RUN(ramp_down_never_switches_off);

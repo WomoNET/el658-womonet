@@ -72,7 +72,7 @@ static void apply_power(dimmer_t *dimmer, bus_memory_t *memory, uint8_t status)
     }
     memory->power = power;
     if (power != 0u) {
-        dimmer_set_power_hold(dimmer, true);
+        dimmer_latch_power(dimmer);
         return;
     }
     dimmer_all_off(dimmer);

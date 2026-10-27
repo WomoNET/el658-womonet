@@ -20,7 +20,8 @@ typedef struct {
     /* Bit per channel: a button ramp drives it */
     uint8_t ramping;
     bool ch7_on;
-    bool power_hold;
+    /* Module power latch: set by any channel switching on, cleared by an all-off */
+    bool power_latched;
 } dimmer_t;
 
 void dimmer_init(dimmer_t *dimmer);
@@ -37,10 +38,11 @@ uint8_t dimmer_level(const dimmer_t *dimmer, uint8_t ch);
 /** Off if on, else back to the level it had when it was switched off. */
 void dimmer_toggle(dimmer_t *dimmer, uint8_t ch);
 
-/** Every channel off and the module power hold released. */
+/** Every channel off; module power goes off once they have faded out. */
 void dimmer_all_off(dimmer_t *dimmer);
 
-void dimmer_set_power_hold(dimmer_t *dimmer, bool on);
+/** Switch module power on; it stays on until the next all-off. */
+void dimmer_latch_power(dimmer_t *dimmer);
 
 /** Start or turn around a button ramp on a PWM channel. */
 void dimmer_ramp(dimmer_t *dimmer, uint8_t ch, bool up);
@@ -57,13 +59,13 @@ void dimmer_set_held(dimmer_t *dimmer, uint8_t mask);
 
 bool dimmer_is_held(const dimmer_t *dimmer, uint8_t ch);
 
-/** Advance every fade by one tick. */
+/** Advance every fade by one tick and latch module power if a channel is on. */
 void dimmer_tick(dimmer_t *dimmer);
 
 /** Current PSC duty of a PWM channel. */
 uint16_t dimmer_duty(const dimmer_t *dimmer, uint8_t ch);
 
-/** Module power output: held by the master, or any channel on or fading out. */
+/** Module power output: latched, or a channel still fading out after an all-off. */
 bool dimmer_module_power(const dimmer_t *dimmer);
 
 #endif

@@ -55,12 +55,12 @@ void dimmer_all_off(dimmer_t *dimmer)
     for (uint8_t ch = 0; ch < CHANNEL_COUNT; ch++) {
         dimmer_set_level(dimmer, ch, LEVEL_OFF);
     }
-    dimmer->power_hold = false;
+    dimmer->power_latched = false;
 }
 
-void dimmer_set_power_hold(dimmer_t *dimmer, bool on)
+void dimmer_latch_power(dimmer_t *dimmer)
 {
-    dimmer->power_hold = on;
+    dimmer->power_latched = true;
 }
 
 void dimmer_ramp(dimmer_t *dimmer, uint8_t ch, bool up)
@@ -101,10 +101,37 @@ bool dimmer_is_held(const dimmer_t *dimmer, uint8_t ch)
     return (dimmer->held & bit(ch)) != 0u;
 }
 
+/* Switched on or heading for a level, including a button ramp */
+static bool any_channel_on(const dimmer_t *dimmer)
+{
+    if (dimmer->ch7_on) {
+        return true;
+    }
+    for (uint8_t ch = 0; ch < PWM_CHANNEL_COUNT; ch++) {
+        if (dimmer->fade[ch].goal != 0u) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static bool any_channel_lit(const dimmer_t *dimmer)
+{
+    for (uint8_t ch = 0; ch < PWM_CHANNEL_COUNT; ch++) {
+        if (dimmer->fade[ch].pos != 0u) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void dimmer_tick(dimmer_t *dimmer)
 {
     for (uint8_t ch = 0; ch < PWM_CHANNEL_COUNT; ch++) {
         fade_tick(&dimmer->fade[ch]);
+    }
+    if (any_channel_on(dimmer)) {
+        dimmer->power_latched = true;
     }
 }
 
@@ -113,15 +140,11 @@ uint16_t dimmer_duty(const dimmer_t *dimmer, uint8_t ch)
     return curve_duty(dimmer->fade[ch].pos);
 }
 
+/*
+ * Like the stock firmware, switching the last channel off leaves module power on;
+ * only an all-off clears the latch. Channels still fading out keep it on.
+ */
 bool dimmer_module_power(const dimmer_t *dimmer)
 {
-    if (dimmer->power_hold || dimmer->ch7_on) {
-        return true;
-    }
-    for (uint8_t ch = 0; ch < PWM_CHANNEL_COUNT; ch++) {
-        if (dimmer->fade[ch].pos != 0u || dimmer->fade[ch].goal != 0u) {
-            return true;
-        }
-    }
-    return false;
+    return dimmer->power_latched || any_channel_on(dimmer) || any_channel_lit(dimmer);
 }

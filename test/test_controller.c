@@ -138,13 +138,13 @@ static void long_press_switches_everything_off_without_toggling(void)
     setup(&f);
     dimmer_set_level(&f.dimmer, 0, 200);
     dimmer_set_level(&f.dimmer, CH7, LEVEL_FULL);
-    dimmer_set_power_hold(&f.dimmer, true);
+    dimmer_latch_power(&f.dimmer);
     press(&f, ALL_OFF_CH4_INPUT, ALL_OFF_CH4_KEY, BUTTON_ALL_OFF_MS + 100);
     press(&f, ALL_OFF_CH4_INPUT, 0, 100);
     CHECK_EQ(level(&f, 0), LEVEL_OFF);
     CHECK_EQ(level(&f, CH4), LEVEL_OFF);
     CHECK_EQ(level(&f, CH7), LEVEL_OFF);
-    CHECK(!f.dimmer.power_hold);
+    CHECK(!f.dimmer.power_latched);
 }
 
 static void all_off_stops_a_running_ramp(void)

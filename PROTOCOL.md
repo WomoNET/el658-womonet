@@ -43,8 +43,9 @@ A PWM channel has 256 levels: 0 is off, 1-255 are evenly spaced in perceived bri
   least 0x1 while the channel is on.
 - Channel 4 "on" in 0x03 sets level 255.
 
-Module power is a separate switched output: on while the master holds it on (see below)
-or while any channel is on or still fading out.
+Module power is a separate switched output. As on the stock firmware it latches: it switches on when the master sets the module power bit or when any
+channel is switched on (bus or button), and stays on, also after the last channel is
+switched off, until an all-off. After power-up it is off.
 
 ## Control Frame 0x03
 
@@ -101,12 +102,11 @@ or while any channel is on or still fading out.
 
 Applied on change only, as on the stock firmware:
 
-- **0 → 1:** module power is switched on and held on, also with every channel off.
-- **1 → 0:** every channel fades off and the hold is released; module power goes off
-  with the last channel. This is applied after the channel values of the same frame, so
-  it wins over them.
+- **0 → 1:** module power is switched on.
+- **1 → 0:** all-off: every channel fades off and module power goes off once they are
+  dark. This is applied after the channel values of the same frame, so it wins over them.
 
-After power-up the bit counts as 0 for both frames and there is no hold.
+After power-up the bit counts as 0 for both frames.
 
 ### Buttons and the bus
 
@@ -115,8 +115,8 @@ as received but not applied: the button wins. Other channels are applied normall
 no frames are dropped after the button is released. The result of a button change is
 reported in the info frames.
 
-A long press on an all-off key switches every channel off and releases the module power
-hold, like a 1 → 0 change of the module power bit.
+A long press on an all-off key is an all-off too, like a 1 → 0 change of the module
+power bit.
 
 ## Info Frame 0x04
 
