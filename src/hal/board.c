@@ -16,7 +16,7 @@
 
 /*
  * Same direction setup as the stock firmware: every pin it drives is an output
- * and starts low. The LIN pins are taken over by the LIN controller.
+ * and starts low. hal_lin_init() then sets up the LIN pins and the transceiver.
  */
 static void init_ports(void)
 {

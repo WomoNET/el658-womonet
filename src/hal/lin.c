@@ -18,16 +18,28 @@
 #define LCMD_TX_RESPONSE 0x03u
 #define ID_MASK 0x3Fu
 
+/* The LIN transceiver stays asleep until the MCU drives this pin high */
+#define TRANSCEIVER_ENABLE_PIN PC1
+
 /* Frame whose response is being received, set when its header asked for one */
 static uint8_t rx_id;
 static uint8_t rx_length;
 
+/* TXLIN and RXLIN as inputs with pull-ups until the controller takes them over */
+static void init_lin_pins(void)
+{
+    DDRD &= (uint8_t)~((1u << PD3) | (1u << PD4));
+    PORTD |= (uint8_t)((1u << PD3) | (1u << PD4));
+}
+
 void hal_lin_init(void)
 {
+    init_lin_pins();
     LINCR = (uint8_t)(1u << LSWRES);
     LINBRR = LIN_DIVIDER;
     LINCR = (uint8_t)(1u << LENA);
     LINENIR = (uint8_t)((1u << LENERR) | (1u << LENIDOK) | (1u << LENTXOK) | (1u << LENRXOK));
+    PORTC |= (uint8_t)(1u << TRANSCEIVER_ENABLE_PIN);
 }
 
 /* The checksum model is taken from LIN13 when the response command starts */
