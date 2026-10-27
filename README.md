@@ -23,17 +23,18 @@ The perceptual curve `src/curve_table.h` is generated; regenerate it with
 ## Flash
 
 The board's 6-pin ISP header takes an STK500v2-compatible programmer (set
-`AVRDUDE_PROGRAMMER` for another avrdude programmer type). The scripts read and write
+`AVRDUDE_PROGRAMMER` for another avrdude programmer type). The scripts write
 **flash only**; never change the fuses or lock bits.
 
 ```
-tools/read.sh <port> stock-read.hex   # first: read the chip, check it is the stock image
+tools/read.sh <port> unit-backup     # first: back up the chip, check it is the stock image
 make flash PORT=<port>                # or: tools/flash.sh <port> build/el658.hex
 tools/restore.sh <port>               # put the stock firmware back
 ```
 
 `read.sh` compares the chip's flash with the stock image
-(by its SHA-256); keep the file it writes.
+(by its SHA-256) and also saves EEPROM, fuses and lock bits; keep
+the directory it writes.
 
 ## Layout
 
