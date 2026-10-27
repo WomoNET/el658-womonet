@@ -15,8 +15,13 @@ AVR_SRC := $(LOGIC_SRC) src/main.c $(wildcard src/hal/*.c)
 TEST_SRC := $(wildcard test/*.c)
 HEADERS := $(wildcard src/*.h src/hal/*.h)
 
+# avr-gcc 16.2 with LTO and the assembler-generated ISR prologues (the default) emits
+# an epilogue that leaves r18 of the interrupted code zeroed; the classic prologues
+# save and restore it properly.
+ISR_FLAGS := -mno-gas-isr-prologues
+
 WARNINGS := -Wall -Wextra -Wshadow -Wstrict-prototypes -Werror
-AVR_CFLAGS := -std=gnu11 $(WARNINGS) -mmcu=$(MCU) -DF_CPU=$(F_CPU) -Os -flto \
+AVR_CFLAGS := -std=gnu11 $(WARNINGS) $(ISR_FLAGS) -mmcu=$(MCU) -DF_CPU=$(F_CPU) -Os -flto \
 	-ffunction-sections -fdata-sections
 AVR_LDFLAGS := -Wl,--gc-sections
 HOST_CFLAGS := -std=gnu11 $(WARNINGS) -Isrc -O1 -g -fsanitize=address,undefined
