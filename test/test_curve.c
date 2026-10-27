@@ -8,10 +8,13 @@ static void below_level_one_is_off(void)
     CHECK_EQ(curve_duty(0x00FF), 0);
 }
 
-static void level_one_is_the_shortest_clean_pulse(void)
+/* Shorter pulses leave the output MOSFET only partly on (measured on the board) */
+#define SHORTEST_FULL_PULSE 9u
+
+static void level_one_switches_fully_with_margin(void)
 {
-    CHECK(curve_duty(0x0100) >= 20);
-    CHECK(curve_duty(0x0100) < 30);
+    CHECK(curve_duty(0x0100) >= SHORTEST_FULL_PULSE + SHORTEST_FULL_PULSE / 4u);
+    CHECK(curve_duty(0x0100) < 2u * SHORTEST_FULL_PULSE);
 }
 
 static void full_level_is_the_pwm_top(void)
@@ -50,7 +53,7 @@ static void middle_level_is_far_below_half_duty(void)
 void test_curve_suite(void)
 {
     RUN(below_level_one_is_off);
-    RUN(level_one_is_the_shortest_clean_pulse);
+    RUN(level_one_switches_fully_with_margin);
     RUN(full_level_is_the_pwm_top);
     RUN(curve_never_decreases);
     RUN(fractions_interpolate_between_levels);

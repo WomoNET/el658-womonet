@@ -48,10 +48,12 @@ the directory it writes.
 
 ## Behaviour
 
-- **PWM:** one-ramp mode, CLKIO / 4, period 4096 clocks: 488 Hz with 12-bit duty.
-  The MOSFET gates are driven through 1 kΩ, so the edges take about 10-15 µs; the period
-  is more than 100 times that. Level 1 is a pulse of `CURVE_MIN_DUTY` PSC clocks
-  (0.5 µs each).
+- **PWM:** one-ramp mode, CLKIO / 4, period 4096 clocks: 488 Hz with 12-bit duty (the
+  internal RC oscillator may run a few percent off). Measured with an LED load, the
+  output edges take about 2.5 µs, so the period is several hundred times longer.
+- **Shortest pulse:** below about 9 PSC clocks (4.7 µs) the output MOSFET only switches
+  partly on. Level 1 is 12 clocks, about 6 µs; the curve offset is `--min-duty` of
+  `tools/gen_curve.py`.
 - **Curve:** 256 levels spaced in CIE lightness, interpolated during fades.
 - **Fades:** switching on or off, and every bus level change, fades in 400 ms
   (`FADE_MS`). A button ramp runs from the lowest level to full in 2.5 s

@@ -59,8 +59,8 @@ static const uint16_t curve_table[{LEVELS}] CURVE_PROGMEM = {{
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--top", type=int, default=4095, help="PSC period top value")
-    parser.add_argument("--min-duty", type=int, default=20,
-                        help="duty of level 1, in PSC clocks")
+    parser.add_argument("--min-duty", type=int, default=10,
+                        help="curve offset in PSC clocks; level 1 is this plus the first step")
     args = parser.parse_args()
     table = build_table(args.top, args.min_duty)
     check_table(table)
