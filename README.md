@@ -34,10 +34,10 @@ tools/restore.sh <port> unit-backup   # put the stock firmware back from the bac
 
 **Back up every unit with `read.sh` before its first flash and keep the directory.** The
 stock firmware is not distributed with this firmware, so that backup is the only way
-back to it. `read.sh` saves flash, EEPROM, fuses and lock bits, tells by the SHA-256 whether the
-flash is the known stock image, and refuses to overwrite an existing backup.
-`restore.sh` writes the backed-up flash only, and refuses an image that is not the
-known stock one unless `ALLOW_UNKNOWN_IMAGE=1` is set.
+back to it: restoring needs it. `read.sh` saves flash, EEPROM, fuses and lock bits,
+tells by the SHA-256 whether the flash is the known stock image, and refuses to
+overwrite an existing backup. `restore.sh` writes the backed-up flash only, and refuses
+an image that is not the known stock one unless `ALLOW_UNKNOWN_IMAGE=1` is set.
 
 ## Layout
 
