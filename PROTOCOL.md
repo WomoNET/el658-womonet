@@ -34,6 +34,13 @@ info frames always report the same state.
 | 4                | PWM; on/off in 0x03 / 0x04, dimmable in 0x28 / 0x29 |
 | 7                | switched, no fade                       |
 
+The channel numbers are the stock firmware's bus numbering. On the board's output
+connectors they sit in swapped pairs:
+
+| Channel   | 1  | 2  | 3  | 4  | 5  | 6  | 7  |
+|-----------|----|----|----|----|----|----|----|
+| Connector | K2 | K1 | K4 | K3 | K6 | K5 | K7 |
+
 A PWM channel has 256 levels: 0 is off, 1-255 are evenly spaced in perceived brightness
 (CIE lightness), 255 is full. Every change fades.
 
