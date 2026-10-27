@@ -1,13 +1,20 @@
 #!/usr/bin/env bash
 # Back up the connected dimmer into <dir>: flash, EEPROM, fuses and lock bits
 # (read only), and tell whether the flash is the stock EL658 image. Run this
-# before the first flash and keep the directory.
+# before the first flash and keep the directory: tools/restore.sh writes the
+# stock firmware back from it.
 set -euo pipefail
 source "$(dirname "$0")/avr-isp.sh"
 
-require_port "${1:-}" "<backup dir>"
+require_port "${1:-}" "[backup dir]"
 port=$1
 dir=${2:-unit-backup}
+
+# Never overwrite a backup: read after a flash, it would replace the stock image
+if [ -e "$dir/flash.bin" ]; then
+    echo "$dir already holds a backup; pass another directory" >&2
+    exit 1
+fi
 mkdir -p "$dir"
 
 avrdude_isp "$port" \
